@@ -1,12 +1,6 @@
 import { SCHOOL } from "@/lib/config";
 
-const BLANK_ROWS = 15;
-const COLUMNS = [
-  "NAME\nTEACHER/STAFF",
-  "ITEM/EQUIPMENT\nBORROWED",
-  "DATE\nBORROWED",
-  "DATE\nRETURNED",
-];
+import { BLANK_ROWS, COLUMNS } from "./print-slip";
 
 export async function createSlipWorkbook() {
   const { Workbook } = await import("exceljs");

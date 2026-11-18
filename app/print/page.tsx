@@ -2,16 +2,10 @@
 
 import { SCHOOL } from "@/lib/config";
 import { useState } from "react";
+import { BLANK_ROWS, COLUMNS } from "./print-slip";
 
 // Milestone 1: static printable slip mirroring the paper form.
 // Deferred to Milestone 2: fill rows from live data + a ?filter= param.
-const BLANK_ROWS = 15;
-const COLUMNS = [
-  "NAME\nTEACHER/STAFF",
-  "ITEM/EQUIPMENT\nBORROWED",
-  "DATE\nBORROWED",
-  "DATE\nRETURNED",
-];
 
 export default function PrintPage() {
   const [exporting, setExporting] = useState(false);
