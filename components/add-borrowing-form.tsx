@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { addBorrowing } from "@/app/actions";
+import { addBorrowing } from "@/app/borrowings/new/actions";
 
 // Milestone 1: form fields wired to the (stubbed) addBorrowing action.
 // Deferred to Milestone 2: client validation + success/error UX refinements.
@@ -11,20 +11,29 @@ export default function AddBorrowingForm() {
   const [item, setItem] = useState("");
   const [dateBorrowed, setDateBorrowed] = useState(today);
   const [message, setMessage] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const result = await addBorrowing({
-      borrower_name: borrowerName,
-      item,
-      date_borrowed: dateBorrowed,
-    });
-    setMessage(result.ok ? "Added." : result.error);
+    setIsSubmitting(true);
+    setMessage(null);
+
+    try {
+      const result = await addBorrowing({
+        borrower_name: borrowerName,
+        item,
+        date_borrowed: dateBorrowed,
+      });
+      setMessage(result.ok ? "Added." : result.error);
+    } catch {
+      setIsSubmitting(false);
+    }
   }
 
   return (
     <form
       onSubmit={handleSubmit}
+      aria-busy={isSubmitting}
       className="glass flex flex-wrap items-end gap-3 rounded-2xl p-5"
     >
       <label className="text-sm">
@@ -52,8 +61,8 @@ export default function AddBorrowingForm() {
           className="glass-input mt-1 block rounded-xl px-3 py-2 text-slate-800 outline-none"
         />
       </label>
-      <button className="rounded-xl bg-[color:var(--primary)] px-4 py-2 text-sm font-semibold text-white shadow-lg transition hover:brightness-110">
-        Add borrowing
+      <button disabled={isSubmitting} className="rounded-xl bg-[color:var(--primary)] px-4 py-2 text-sm font-semibold text-white shadow-lg transition hover:brightness-110">
+        {isSubmitting ? "Adding..." : "Add borrowing"}
       </button>
       {message && <span className="text-sm text-amber-700">{message}</span>}
     </form>
