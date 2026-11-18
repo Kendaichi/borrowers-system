@@ -1,21 +1,40 @@
 "use client";
 
 import { SCHOOL } from "@/lib/config";
+import { useState } from "react";
+import { BLANK_ROWS, COLUMNS } from "./print-slip";
 
 // Milestone 1: static printable slip mirroring the paper form.
 // Deferred to Milestone 2: fill rows from live data + a ?filter= param.
-const BLANK_ROWS = 15;
-const COLUMNS = [
-  "NAME\nTEACHER/STAFF",
-  "ITEM/EQUIPMENT\nBORROWED",
-  "DATE\nBORROWED",
-  "DATE\nRETURNED",
-];
 
 export default function PrintPage() {
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState("");
+
+  async function exportExcel() {
+    setExporting(true);
+    setExportError("");
+    try {
+      const { downloadSlipExcel } = await import("./export-slip");
+      await downloadSlipExcel();
+    } catch {
+      setExportError("Could not export the Excel file. Please try again.");
+    } finally {
+      setExporting(false);
+    }
+  }
+
   return (
     <main className="mx-auto max-w-3xl px-6 py-8">
-      <div className="no-print mb-4 flex justify-end">
+      <div className="no-print mb-4 flex flex-wrap justify-end gap-2">
+        <button
+          type="button"
+          onClick={exportExcel}
+          disabled={exporting}
+          className="rounded bg-emerald-700 px-4 py-2 text-sm text-white hover:bg-emerald-600 disabled:cursor-wait disabled:opacity-60"
+        >
+          {exporting ? "Exporting…" : "Export to Excel"}
+        </button>
         <button
           onClick={() => window.print()}
           className="rounded bg-slate-800 px-4 py-2 text-sm text-white hover:bg-slate-700"
@@ -23,6 +42,7 @@ export default function PrintPage() {
           Print / Save as PDF
         </button>
       </div>
+      {exportError && <p role="alert" className="no-print mb-4 text-sm text-red-700">{exportError}</p>}
 
       <section className="print-slip">
         <header className="mb-6 text-center">
