@@ -76,12 +76,12 @@ The shared foundation (`lib/*`, `middleware.ts`, auth, global styles) is built i
 treated as a **frozen base**. Feature work is then split **per route**, so each developer owns a page
 end-to-end and no one waits on another.
 
-| Route | Area | Owner | Owns |
-|-------|------|-------|------|
-| `/` | Borrowings list, stats, mark-returned | **Kendaichi** | `app/page.tsx`, `components/borrowings-table.tsx`, `components/stats-strip.tsx` |
-| `/borrowings/new` | Add-borrowing form | **Angelo Galope** (angelogalope) | `app/borrowings/new/page.tsx`, `components/add-borrowing-form.tsx` |
-| `/print` | Printable slip + export | **Joe** (joeburmon) | `app/print/page.tsx` |
-| `/login` | Authentication | shared / rotates | `app/login/page.tsx` |
+| Route             | Area                                  | Owner                            | Owns                                                                            |
+| ----------------- | ------------------------------------- | -------------------------------- | ------------------------------------------------------------------------------- |
+| `/`               | Borrowings list, stats, mark-returned | **Kendaichi**                    | `app/page.tsx`, `components/borrowings-table.tsx`, `components/stats-strip.tsx` |
+| `/borrowings/new` | Add-borrowing form                    | **Angelo Galope** (angelogalope) | `app/borrowings/new/page.tsx`, `components/add-borrowing-form.tsx`              |
+| `/print`          | Printable slip + export               | **Joe** (joeburmon)              | `app/print/page.tsx`                                                            |
+| `/login`          | Authentication                        | shared / rotates                 | `app/login/page.tsx`                                                            |
 
 Rules that keep it non-blocking:
 
