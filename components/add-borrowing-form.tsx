@@ -41,7 +41,7 @@ export default function AddBorrowingForm() {
         <input
           value={borrowerName}
           onChange={(e) => setBorrowerName(e.target.value)}
-          className="glass-input mt-1 block rounded-xl px-3 py-2 text-slate-800 outline-none"
+          className="glass-input mt-1 block border-1 border-gray-400 rounded-lg px-3 py-2 text-slate-800 outline-none"
         />
       </label>
       <label className="text-sm">
@@ -49,7 +49,7 @@ export default function AddBorrowingForm() {
         <input
           value={item}
           onChange={(e) => setItem(e.target.value)}
-          className="glass-input mt-1 block rounded-xl px-3 py-2 text-slate-800 outline-none"
+          className="glass-input mt-1 block border-1 border-gray-400 rounded-lg px-3 py-2 text-slate-800 outline-none"
         />
       </label>
       <label className="text-sm">
@@ -58,7 +58,7 @@ export default function AddBorrowingForm() {
           type="date"
           value={dateBorrowed}
           onChange={(e) => setDateBorrowed(e.target.value)}
-          className="glass-input mt-1 block rounded-xl px-3 py-2 text-slate-800 outline-none"
+          className="glass-input mt-1 block border-1 border-gray-400 rounded-lg px-3 py-2 text-slate-800 outline-none"
         />
       </label>
       <button disabled={isSubmitting} className="rounded-xl bg-[color:var(--primary)] px-4 py-2 text-sm font-semibold text-white shadow-lg transition hover:brightness-110">
