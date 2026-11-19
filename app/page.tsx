@@ -21,7 +21,9 @@ export default async function DashboardPage() {
     const { data } = await supabase
       .from("borrowings")
       .select("*")
-      .order("date_borrowed", { ascending: false });
+      // created_at breaks ties so same-day rows keep a stable order across updates.
+      .order("date_borrowed", { ascending: false })
+      .order("created_at", { ascending: false });
     rows = data ?? [];
   }
 
