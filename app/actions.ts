@@ -13,14 +13,6 @@ const NOT_IMPLEMENTED: ActionResult = {
   error: "Not implemented yet (Milestone 2).",
 };
 
-export async function addBorrowing(_input: {
-  borrower_name: string;
-  item: string;
-  date_borrowed: string;
-}): Promise<ActionResult> {
-  return NOT_IMPLEMENTED;
-}
-
 export async function markReturned(_id: string): Promise<ActionResult> {
   return NOT_IMPLEMENTED;
 }
