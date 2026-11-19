@@ -1,10 +1,11 @@
 import { SCHOOL } from "@/lib/config";
+import type { Borrowing } from "@/lib/types";
 
 import { BLANK_ROWS, COLUMNS } from "./print-slip";
 
-export async function createSlipWorkbook() {
-  const { Workbook } = await import("exceljs");
-  const workbook = new Workbook();
+export async function createSlipWorkbook(rows: Borrowing[] = []) {
+  const { default: ExcelJS } = await import("exceljs");
+  const workbook = new ExcelJS.Workbook();
   const sheet = workbook.addWorksheet("Borrowers Slip", {
     pageSetup: {
       paperSize: 9,
@@ -35,7 +36,11 @@ export async function createSlipWorkbook() {
   const header = sheet.getRow(8);
   header.values = COLUMNS;
   header.height = 36;
-  for (let row = 8; row <= 8 + BLANK_ROWS; row++) {
+  rows.forEach((borrowing, i) => {
+    sheet.getRow(9 + i).values = [borrowing.borrower_name, borrowing.item, borrowing.date_borrowed, borrowing.date_returned ?? ""];
+  });
+  const rowCount = Math.max(BLANK_ROWS, rows.length);
+  for (let row = 8; row <= 8 + rowCount; row++) {
     if (row > 8) sheet.getRow(row).height = 30;
     for (let column = 1; column <= 4; column++) {
       const cell = sheet.getCell(row, column);
@@ -46,12 +51,12 @@ export async function createSlipWorkbook() {
       if (column >= 3 && row > 8) cell.numFmt = "mm/dd/yyyy";
     }
   }
-  sheet.pageSetup.printArea = `A1:D${8 + BLANK_ROWS}`;
+  sheet.pageSetup.printArea = `A1:D${8 + rowCount}`;
   return workbook;
 }
 
-export async function downloadSlipExcel() {
-  const workbook = await createSlipWorkbook();
+export async function downloadSlipExcel(rows: Borrowing[] = []) {
+  const workbook = await createSlipWorkbook(rows);
   const buffer = await workbook.xlsx.writeBuffer();
   const blob = new Blob([new Uint8Array(buffer)], {
     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
