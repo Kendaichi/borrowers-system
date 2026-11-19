@@ -7,8 +7,10 @@ import type { Borrowing } from "@/lib/types";
 import { MOCK_BORROWINGS } from "@/lib/mock";
 import StatsStrip from "@/components/stats-strip";
 import BorrowingsTable from "@/components/borrowings-table";
+import BorrowingToast from "@/components/borrowing-toast";
 
-export default async function DashboardPage() {
+export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ borrowed?: string }> }) {
+  const { borrowed } = await searchParams;
   // Preview mode shows mock rows; configured mode queries Supabase.
   let rows: Borrowing[] = MOCK_BORROWINGS;
   let email = "preview mode";
@@ -29,6 +31,7 @@ export default async function DashboardPage() {
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-8">
+      {borrowed === "1" && <BorrowingToast />}
       <header className="glass-strong mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl px-5 py-4">
         <div>
           <h1 className="text-lg font-bold text-slate-900">{SCHOOL.name}</h1>

@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import type { ActionResult } from "@/lib/types";
@@ -71,5 +70,5 @@ export async function addBorrowing(
     }
 
     revalidatePath("/");
-    redirect("/");
+    return { ok: true };
 }

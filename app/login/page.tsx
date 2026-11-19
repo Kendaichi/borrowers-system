@@ -23,14 +23,26 @@ export default function LoginPage() {
       return;
     }
 
-    setBusy(true);
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setBusy(false);
+     setBusy(true);
+    try {
+      const supabase = createClient();
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (error) {
-      setError(error.message);
-      return;
+      if (authError) {
+        setError(authError.message);
+        return;
+      }
+
+      router.push("/");
+      router.refresh();
+    } catch (error) {
+      console.error("Login failed:", error);
+      setError("Unable to sign in. Please try again.");
+    } finally {
+      setBusy(false);
     }
     router.push("/");
     router.refresh();
@@ -84,7 +96,17 @@ export default function LoginPage() {
           disabled={busy}
           className="w-full rounded-xl bg-[color:var(--primary)] py-2 font-semibold text-white shadow-lg transition hover:brightness-110 disabled:opacity-60"
         >
-          {busy ? "Signing in…" : "Sign in"}
+          {busy ? (
+            <span className="inline-flex items-center justify-center">
+              <span className="sr-only">Signing in...</span>
+              <span
+                aria-hidden="true"
+                className="h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white"
+              />
+            </span>
+          ) : (
+            "Sign in"
+          )}
         </button>
       </form>
     </main>
