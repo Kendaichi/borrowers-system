@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { addBorrowing } from "@/app/borrowings/new/actions";
 
-// Milestone 1: form fields wired to the (stubbed) addBorrowing action.
-// Deferred to Milestone 2: client validation + success/error UX refinements.
 export default function AddBorrowingForm() {
+  const router = useRouter();
   const today = new Date().toISOString().slice(0, 10);
   const [borrowerName, setBorrowerName] = useState("");
   const [item, setItem] = useState("");
@@ -25,7 +25,13 @@ export default function AddBorrowingForm() {
         item: item === "Other" ? customItem.trim() : item,
         date_borrowed: dateBorrowed,
       });
-      setMessage(result.ok ? "Added." : result.error);
+      if (result.ok) {
+        router.push("/?borrowed=1");
+      } else {
+        setMessage(result.error);
+      }
+    } catch {
+      setMessage("Could not confirm the borrowing was saved. Please check your records before trying again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -94,7 +100,7 @@ export default function AddBorrowingForm() {
       <button disabled={isSubmitting} className="rounded-xl bg-[color:var(--primary)] px-4 py-2 text-sm font-semibold text-white shadow-lg transition hover:brightness-110">
         {isSubmitting ? "Adding..." : "Add borrowing"}
       </button>
-      {message && <span className="text-sm text-amber-700">{message}</span>}
+      {message && <span role="alert" className="text-sm text-amber-700">{message}</span>}
     </form>
   );
 }
