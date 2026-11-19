@@ -41,7 +41,6 @@ export default function PrintView({ rows, preview = false }: { rows: Borrowing[]
         </button>
       </div>
       {exportError && <p role="alert" className="no-print mb-4 text-sm text-red-700">{exportError}</p>}
-      {preview && <p className="mb-4 text-sm text-amber-800">Preview mode — sample borrowing data. Configure Supabase to load saved records.</p>}
       {!rows.length && <p className="no-print mb-4 text-sm text-slate-600">No borrowings found.</p>}
 
       <section className="print-slip">
@@ -71,7 +70,7 @@ export default function PrintView({ rows, preview = false }: { rows: Borrowing[]
               </tr>
             ))}
             {Array.from({ length: Math.max(0, BLANK_ROWS - rows.length) }).map((_, i) => (
-              <tr key={i}>
+              <tr key={`borrower-${i}`}>
                 {COLUMNS.map((c) => (
                   <td key={c} className="border border-slate-800 p-4" />
                 ))}
