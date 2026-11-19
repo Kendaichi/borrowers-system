@@ -62,7 +62,7 @@ export default function LoginPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required={isSupabaseConfigured}
-            className="glass-input mt-1 w-full rounded-xl px-3 py-2 text-slate-800 outline-none"
+            className="glass-input mt-1 w-full border-1 border-gray-400 rounded-lg px-3 py-2 text-slate-800 outline-none"
           />
         </label>
 
@@ -73,7 +73,7 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required={isSupabaseConfigured}
-            className="glass-input mt-1 w-full rounded-xl px-3 py-2 text-slate-800 outline-none"
+            className="glass-input mt-1 w-full border-1 border-gray-400 rounded-lg px-3 py-2 text-slate-800 outline-none"
           />
         </label>
 
