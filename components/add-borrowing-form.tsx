@@ -25,7 +25,7 @@ export default function AddBorrowingForm() {
         date_borrowed: dateBorrowed,
       });
       setMessage(result.ok ? "Added." : result.error);
-    } catch {
+    } finally {
       setIsSubmitting(false);
     }
   }
