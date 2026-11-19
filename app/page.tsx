@@ -9,15 +9,20 @@ import StatsStrip from "@/components/stats-strip";
 import BorrowingsTable from "@/components/borrowings-table";
 
 export default async function DashboardPage() {
-  // Milestone 1: rows come from mock data. Milestone 2 swaps this for a
-  // Supabase query (`select * from borrowings order by date_borrowed desc`).
-  const rows: Borrowing[] = MOCK_BORROWINGS;
-
+  // Preview mode shows mock rows; configured mode queries Supabase.
+  let rows: Borrowing[] = MOCK_BORROWINGS;
   let email = "preview mode";
+
   if (isSupabaseConfigured) {
     const supabase = await createClient();
-    const { data } = await supabase.auth.getUser();
-    email = data.user?.email ?? email;
+    const { data: userData } = await supabase.auth.getUser();
+    email = userData.user?.email ?? email;
+
+    const { data } = await supabase
+      .from("borrowings")
+      .select("*")
+      .order("date_borrowed", { ascending: false });
+    rows = data ?? [];
   }
 
   return (
