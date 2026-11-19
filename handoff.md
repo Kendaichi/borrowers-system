@@ -1,5 +1,34 @@
 # Handoff — Borrower's Slip System
 
+## 2026-11-19 - Live data wired into dashboard + print (merged to `develop`)
+- **Dashboard list** (Kendaichi, PR #6 `fix/list-not-fetching-supabase-data`, `507099d`):
+  `app/page.tsx` now selects from `borrowings` (newest first) when configured; mock only in preview.
+  Fixes "an added borrower didn't show" - the list had been hardcoded to mock rows. Supersedes an
+  earlier throwaway edit on `feat/auth`; this is the canonical version, on the owner's branch.
+- **Print slip** (Joe, PR #5 `feat/add-print-and-export`, `673e1e6` + `5d91677`): print/export now
+  render live data; extracted `app/print/print-view.tsx`, slimmed `page.tsx`, updated
+  `export-slip.ts`, removed the preview-mode message.
+- **Verified**: both merged to `develop`; not re-tested in this session.
+
+## 2026-11-19 - Auth went live (Frank; local `.env.local` + Supabase dashboard)
+- **What**: real auth now works end-to-end (login, session guard, sign-out) against the live
+  Supabase project; the app is out of preview mode. A config fix, not a code change.
+- **Root cause of "auth was bypassed"**: `.env.local` exposed the browser key as
+  `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, but the code reads `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+  (`lib/supabase/env.ts`). So `SUPABASE_ANON_KEY` resolved to `""`, `isSupabaseConfigured` was
+  `false`, and the app stayed in preview mode (auth bypassed, mock data). **Fix**: renamed the var
+  to `NEXT_PUBLIC_SUPABASE_ANON_KEY`. The value is the new `sb_publishable_` key (browser-safe;
+  supabase-js forwards it as `apikey`). `.env.local` is gitignored, so the `sb_secret_` key in it is
+  not committed and is not read by any app code.
+- **Custodian account**: created in the Supabase dashboard (Authentication -> Users), email
+  confirmed. Login + sign-out loop verified against the real project.
+- **Verified**: login succeeds; session persists; sign-out returns to `/login` (user-confirmed in
+  the running app).
+- **Still open / TODO**:
+  - **Disable public sign-ups**: Authentication -> Providers -> Email -> turn OFF "Allow new users
+    to sign up" (single-custodian rule). Dashboard toggle, not yet done.
+  - `markReturned` / `markUnreturned` still stubbed in `app/actions.ts` ("Not implemented yet").
+
 ## 2026-11-19 - Fix: dev server 500s (bad dependency bump)
 - **What**: `npm run dev` returned 500 on every route. `globals.css` failed with "trying to use
   `tailwindcss` directly as a PostCSS plugin." Root cause was commit `3510361` ("chore: update
@@ -33,16 +62,15 @@
   wires live data into print, do the same for the export. Requires `exceljs` v4 (`^4.4.0`): a
   downgrade breaks `workbook.xlsx.writeBuffer()` (see the 2026-11-19 entry).
 
-## 2026-11-18 - In review: add-borrowing action (Angelo, branch `feat/add-borrowing`, NOT merged)
-- Real `addBorrowing` server action in `app/borrowings/new/actions.tsx` (trim + ISO-date validation
+## 2026-11-18 - add-borrowing action (Angelo, merged via PR #2)
+- Real `addBorrowing` server action in `app/borrowings/new/actions.ts` (trim + ISO-date validation
   + Supabase insert + `revalidatePath` + redirect) and submit-state UX in
-  `components/add-borrowing-form.tsx`. Form now imports the action from the route folder, not
+  `components/add-borrowing-form.tsx`. Form imports the action from the route folder, not
   `app/actions.ts`.
-- **Blocker before merge**: `handleSubmit` only clears `isSubmitting` inside `catch`, but the action
-  returns errors instead of throwing, so any returned error leaves the form stuck on "Adding...".
-  Fix: move the reset to `finally`.
-- **Cleanup**: rename `actions.tsx` -> `.ts` (no JSX); delete the now-orphaned `addBorrowing` stub
-  in `app/actions.ts` (nothing imports it once this PR lands) - a shared-file change, coordinate.
+- **Review blockers, all resolved before merge**: `handleSubmit` reset moved to `finally` so a
+  returned error no longer sticks on "Adding..." (`c1cdea1`); `actions.tsx` renamed to `.ts`, no JSX
+  (`711e63a`); orphaned `addBorrowing` stub removed from `app/actions.ts` (`1095db9`). Merged in
+  `57c6fce` (PR #2).
 
 ## 2026-11-12 — Milestone 1: boilerplate
 - **What**: Scaffolded the Next.js (App Router, TS) + Tailwind + Supabase app end-to-end as a
@@ -79,5 +107,6 @@
   very old browsers — degrades to a translucent panel (still readable).
 
 ## Next (Milestone 2)
-Real action logic + validation, Supabase query in `page.tsx`, search + Out/Returned/All tabs,
-overdue highlighting, live counts, live/filterable print slip, end-to-end tests.
+Done: add-borrowing (PR #2), auth live, dashboard reads Supabase (PR #6), print/export live data
+(PR #5). Remaining: `markReturned` / `markUnreturned` logic + validation, search + Out/Returned/All
+tabs, overdue highlighting, live counts, filterable print slip, end-to-end tests.

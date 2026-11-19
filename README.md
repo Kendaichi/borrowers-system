@@ -4,8 +4,9 @@ A web app that replaces the paper **Borrower's Slip** used by the **Office of th
 Custodian** at Dulong Bayan Elementary School. The custodian records borrowed equipment, marks
 returns, sees what's still out (and overdue), searches, and prints/exports a filled slip.
 
-> **Status: Milestone 1 — boilerplate.** The app runs, authenticates, and renders all screens, but
-> the add / return / search / live-data features are stubbed. See [Roadmap](#roadmap).
+> **Status: Milestone 2 (in progress).** Auth, add-borrowing, the live dashboard list, and
+> print/export live data all work against Supabase. Still stubbed: mark-returned / undo, search,
+> Out/Returned/All tabs, and overdue highlighting. See [Roadmap](#roadmap).
 
 ## Stack
 
@@ -54,17 +55,24 @@ npm run test:status  # assert-based self-test for the overdue/status logic
 app/
   layout.tsx            # app shell + <head>
   globals.css           # theme + print (@media print) styles
-  page.tsx              # dashboard: stats + add form + table (protected)
+  page.tsx              # dashboard: stats + table, reads Supabase (protected)
   login/page.tsx        # custodian email/password login
-  print/page.tsx        # printable slip (Save as PDF)
-  actions.ts            # server actions (add/return stubbed in M1; signOut real)
+  borrowings/new/
+    page.tsx            # add-borrowing form page
+    actions.ts          # addBorrowing server action (validate + insert)
+  print/
+    page.tsx            # printable slip (Save as PDF) + Export to Excel
+    print-view.tsx      # slip rows rendered from live data
+    print-slip.ts       # shared BLANK_ROWS / COLUMNS
+    export-slip.ts      # .xlsx export (exceljs, lazy-loaded)
+  actions.ts            # shared actions: markReturned/markUnreturned (stubbed), signOut
 components/
   stats-strip.tsx       # Total / Out / Overdue / Returned tiles
   borrowings-table.tsx  # the slip table
   add-borrowing-form.tsx
 lib/
   types.ts, config.ts, status.ts   # shared contracts
-  mock.ts                          # placeholder rows (M1)
+  mock.ts                          # placeholder rows (preview mode)
   supabase/{client,server,middleware,env}.ts
 middleware.ts           # session refresh + auth guard
 supabase/schema.sql     # run once in Supabase
@@ -80,14 +88,15 @@ end-to-end and no one waits on another.
 |-------|------|-------|------|
 | `/` | Borrowings list, stats, mark-returned | **Kendaichi** | `app/page.tsx`, `components/borrowings-table.tsx`, `components/stats-strip.tsx` |
 | `/borrowings/new` | Add-borrowing form | **Angelo Galope** (angelogalope) | `app/borrowings/new/page.tsx`, `components/add-borrowing-form.tsx` |
-| `/print` | Printable slip + export | **Joe** (joeburmon) | `app/print/page.tsx` |
+| `/print` | Printable slip + export | **Joe** (joeburmon) | `app/print/*` (`page.tsx`, `print-view.tsx`, `print-slip.ts`, `export-slip.ts`) |
 | `/login` | Authentication | shared / rotates | `app/login/page.tsx` |
 
 Rules that keep it non-blocking:
 
 - Own your `app/<route>/` folder, its colocated components, and (in Milestone 2) its own server
-  actions at `app/<route>/actions.ts` — no shared `app/actions.ts` to collide on. _(M1 keeps the
-  stubs in `app/actions.ts`; split them per route when you implement them.)_
+  actions at `app/<route>/actions.ts` - no shared `app/actions.ts` to collide on. _(add-borrowing
+  now lives in `app/borrowings/new/actions.ts`; mark-returned / undo stay in the shared
+  `app/actions.ts` until implemented.)_
 - **Shared base — coordinate changes (rare):** `lib/*`, `middleware.ts`, `app/layout.tsx`,
   `app/globals.css`. The DB schema + `lib/{types,status,config}` are stable contracts.
 - Query `public.borrowings` directly through `lib/supabase/server` from your own page.
@@ -106,6 +115,6 @@ Format: `type(optional-scope): short imperative summary`
 
 ## Roadmap
 
-**Milestone 2 (features):** real add / mark-returned / undo with validation, in-memory search +
-Out/Returned/All tabs, overdue highlighting, live dashboard counts, live + filterable print slip,
-end-to-end tests.
+**Milestone 2 (features).** Done: real add-borrowing with validation, live auth, dashboard reads
+Supabase, print/export live data. Remaining: mark-returned / undo, in-memory search +
+Out/Returned/All tabs, overdue highlighting, filterable print slip, end-to-end tests.
